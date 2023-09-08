@@ -465,9 +465,6 @@ def run_demo(
         with gr.Row():
             with gr.Column(scale=1):
                 gr.Markdown('# ' + _TITLE)
-            with gr.Column(scale=0):
-                gr.DuplicateButton(value='Duplicate Space for private use',
-                            elem_id='duplicate-button')
         gr.Markdown(_DESCRIPTION)
 
         with gr.Row(variant='panel'):
