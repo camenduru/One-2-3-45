@@ -632,7 +632,7 @@ def run_demo(
                             ).success(fn=partial(update_guide, _REGEN_2), outputs=[guide_text], queue=False)
 
 
-    demo.queue().launch(share=True, max_threads=80) # auth=("admin", os.environ['PASSWD'])
+    demo.queue().launch(debug=True, share=True) # auth=("admin", os.environ['PASSWD'])
 
 
 if __name__ == '__main__':
