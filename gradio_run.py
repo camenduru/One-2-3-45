@@ -53,7 +53,7 @@ def stage2_run(model, device, exp_dir,
     else:
         zero123_infer(model, exp_dir, indices=list(range(1,4))+list(range(8,12)), device=device, ddim_steps=stage2_steps, scale=scale)
 
-def reconstruct(exp_dir, output_format=".ply", device_idx=0, resolution=256):
+def reconstruct(exp_dir, output_format=".glb", device_idx=0, resolution=256):
     exp_dir = os.path.abspath(exp_dir)
     main_dir_path = os.path.abspath(os.path.dirname("./"))
     os.chdir('reconstruction/')
