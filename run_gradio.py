@@ -96,13 +96,30 @@ def predict_multiview(shape_dir, args):
     stage2_run(model_zero123, device, shape_dir, elev, scale=3, stage2_steps=50)
 
 def generate(img_path):
+    shape_id = img_path.split('/')[-1].split('.')[0]
+    shape_dir = f"./exp/{shape_id}"
+    os.makedirs(shape_dir, exist_ok=True)
+    
+    device = f"cuda:0"
+    models = init_model(device, 'zero123-xl.ckpt', half_precision=True)
+    model_zero123 = models["turncam"]
+
+    predictor = sam_init(0)
+    input_raw = Image.open(img_path)
+    input_256 = preprocess(predictor, input_raw)
+    elev, stage1_imgs = stage1_run(model_zero123, device, shape_dir, input_256, scale=3, ddim_steps=75)
+    stage2_run(model_zero123, device, shape_dir, elev, scale=3, stage2_steps=50)
+
+    mesh_path = reconstruct(shape_dir)
+    print("Mesh saved to:", mesh_path)
+
     # shape_id = img_path.split('/')[-1].split('.')[0]
     # shape_dir = f"./exp/{shape_id}"
     # os.makedirs(shape_dir, exist_ok=True)
-    # predict_multiview(shape_dir, args)
+    # predict_multiview(shape_dir)
     # mesh_path = reconstruct(shape_dir, output_format=".ply", device_idx=0, resolution=256)
     # print("Mesh saved to:", mesh_path)
-    return img_path
+    return mesh_path
 
 block = gr.Blocks().queue()
 with block:
