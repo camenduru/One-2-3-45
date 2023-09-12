@@ -118,23 +118,19 @@ def generate(img_path, device, models, predictor):
     return mesh_path
 
 
-def run_demo():
-    device = f"cuda:0"
-    models = init_model(device, 'zero123-xl.ckpt', half_precision=True)
-    predictor = sam_init(0)
+device = f"cuda:0"
+models = init_model(device, 'zero123-xl.ckpt', half_precision=True)
+predictor = sam_init(0)
 
-    block = gr.Blocks().queue()
-    with block:
-        with gr.Row():
-            with gr.Column():
-                input_image = gr.Image(source='upload', type="filepath")
-                run_button = gr.Button(label="Run")
-            with gr.Column():
-                mesh_path = gr.Textbox(label="Mesh Path")
-                # mesh_output = gr.Model3D(clear_color=[0.0, 0.0, 0.0, 0.0], label="One-2-3-45's Textured Mesh", elem_id="model-3d-out")
-        run_button.click(fn=generate, inputs=[input_image, device, models, predictor], outputs=[mesh_path])
+block = gr.Blocks().queue()
+with block:
+    with gr.Row():
+        with gr.Column():
+            input_image = gr.Image(source='upload', type="filepath")
+            run_button = gr.Button(label="Run")
+        with gr.Column():
+            mesh_path = gr.Textbox(label="Mesh Path")
+            # mesh_output = gr.Model3D(clear_color=[0.0, 0.0, 0.0, 0.0], label="One-2-3-45's Textured Mesh", elem_id="model-3d-out")
+    run_button.click(fn=generate, inputs=[input_image, device, models, predictor], outputs=[mesh_path])
 
-    block.launch(share=True)
-
-if __name__ == '__main__':
-    run_demo()
+block.launch(share=True)
