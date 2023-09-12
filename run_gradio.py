@@ -108,7 +108,7 @@ block = gr.Blocks().queue()
 with block:
     with gr.Row():
         with gr.Column():
-            input_image = gr.Image(source='upload', type="numpy")
+            input_image = gr.Image(source='upload')
             run_button = gr.Button(label="Run")
         with gr.Column():
             mesh_path = gr.Textbox(label="Mesh Path")
