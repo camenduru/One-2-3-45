@@ -8,9 +8,6 @@ from utils.sam_utils import sam_init, sam_out_nosave
 from utils.utils import pred_bbox, image_preprocess_nosave, gen_poses, convert_mesh_format
 from elevation_estimate.estimate_wild_imgs import estimate_elev
 
-models = None
-model_zero123 = None
-
 def preprocess(predictor, raw_im, lower_contrast=False):
     raw_im.thumbnail([512, 512], Image.Resampling.LANCZOS)
     image_sam = sam_out_nosave(predictor, raw_im.convert("RGB"), pred_bbox(raw_im))
@@ -78,25 +75,25 @@ def reconstruct(exp_dir, output_format=".ply", device_idx=0, resolution=256):
         return ply_path
     return convert_mesh_format(exp_dir, output_format=output_format)
 
-def predict_multiview(shape_dir, args):
-    device = f"cuda:{args.gpu_idx}"
+# def predict_multiview(shape_dir, args):
+#     device = f"cuda:{args.gpu_idx}"
 
-    # initialize the zero123 model
-    models = init_model(device, 'zero123-xl.ckpt', half_precision=args.half_precision)
-    model_zero123 = models["turncam"]
+#     # initialize the zero123 model
+#     models = init_model(device, 'zero123-xl.ckpt', half_precision=args.half_precision)
+#     model_zero123 = models["turncam"]
 
-    # initialize the Segment Anything model
-    predictor = sam_init(args.gpu_idx)
-    input_raw = Image.open(args.img_path)
+#     # initialize the Segment Anything model
+#     predictor = sam_init(args.gpu_idx)
+#     input_raw = Image.open(args.img_path)
 
-    # preprocess the input image
-    input_256 = preprocess(predictor, input_raw)
+#     # preprocess the input image
+#     input_256 = preprocess(predictor, input_raw)
 
-    # generate multi-view images in two stages with Zero123.
-    # first stage: generate N=8 views cover 360 degree of the input shape.
-    elev, stage1_imgs = stage1_run(model_zero123, device, shape_dir, input_256, scale=3, ddim_steps=75)
-    # second stage: 4 local views for each of the first-stage view, resulting in N*4=32 source view images.
-    stage2_run(model_zero123, device, shape_dir, elev, scale=3, stage2_steps=50)
+#     # generate multi-view images in two stages with Zero123.
+#     # first stage: generate N=8 views cover 360 degree of the input shape.
+#     elev, stage1_imgs = stage1_run(model_zero123, device, shape_dir, input_256, scale=3, ddim_steps=75)
+#     # second stage: 4 local views for each of the first-stage view, resulting in N*4=32 source view images.
+#     stage2_run(model_zero123, device, shape_dir, elev, scale=3, stage2_steps=50)
 
 def generate(img_path, device, models, predictor):
     shape_id = img_path.split('/')[-1].split('.')[0]
