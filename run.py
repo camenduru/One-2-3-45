@@ -79,6 +79,12 @@ def reconstruct(exp_dir, output_format=".ply", device_idx=0, resolution=256):
 def predict_multiview(shape_dir, args):
     device = f"cuda:{args.gpu_idx}"
 
+    global models
+    if models is not None:
+        return models
+    else:
+        models = init_model(device, 'zero123-xl.ckpt', half_precision=args.half_precision)
+
     # initialize the zero123 model
     models = init_model(device, 'zero123-xl.ckpt', half_precision=args.half_precision)
     model_zero123 = models["turncam"]
