@@ -8,6 +8,9 @@ from utils.sam_utils import sam_init, sam_out_nosave
 from utils.utils import pred_bbox, image_preprocess_nosave, gen_poses, convert_mesh_format
 from elevation_estimate.estimate_wild_imgs import estimate_elev
 
+models = None
+model_zero123 = None
+
 def preprocess(predictor, raw_im, lower_contrast=False):
     raw_im.thumbnail([512, 512], Image.Resampling.LANCZOS)
     image_sam = sam_out_nosave(predictor, raw_im.convert("RGB"), pred_bbox(raw_im))
@@ -101,8 +104,17 @@ def generate(img_path):
     os.makedirs(shape_dir, exist_ok=True)
     
     device = f"cuda:0"
-    models = init_model(device, 'zero123-xl.ckpt', half_precision=True)
-    model_zero123 = models["turncam"]
+    global models
+    if models is not None:
+        return models
+    else:
+        models = init_model(device, 'zero123-xl.ckpt', half_precision=True)
+    
+    global model_zero123
+    if model_zero123 is not None:
+        return model_zero123
+    else:
+        model_zero123 = models["turncam"]
 
     predictor = sam_init(0)
     input_raw = Image.open(img_path)
