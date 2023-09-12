@@ -7,8 +7,6 @@ from utils.sam_utils import sam_init, sam_out_nosave
 from utils.utils import pred_bbox, image_preprocess_nosave, gen_poses, convert_mesh_format
 from elevation_estimate.estimate_wild_imgs import estimate_elev
 
-models = None
-
 def preprocess(predictor, raw_im, lower_contrast=False):
     raw_im.thumbnail([512, 512], Image.Resampling.LANCZOS)
     image_sam = sam_out_nosave(predictor, raw_im.convert("RGB"), pred_bbox(raw_im))
@@ -80,14 +78,8 @@ def reconstruct(exp_dir, output_format=".ply", device_idx=0, resolution=256):
 def predict_multiview(shape_dir, args):
     device = f"cuda:{args.gpu_idx}"
 
-    global models
-    if models is not None:
-        return models
-    else:
-        models = init_model(device, 'zero123-xl.ckpt', half_precision=args.half_precision)
-
     # initialize the zero123 model
-    # models = init_model(device, 'zero123-xl.ckpt', half_precision=args.half_precision)
+    models = init_model(device, 'zero123-xl.ckpt', half_precision=args.half_precision)
     model_zero123 = models["turncam"]
 
     # initialize the Segment Anything model
