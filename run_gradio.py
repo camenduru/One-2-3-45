@@ -1,7 +1,6 @@
 import os
 import gradio as gr
 import torch
-import fire
 from PIL import Image
 from utils.zero123_utils import init_model, predict_stage1_gradio, zero123_infer
 from utils.sam_utils import sam_init, sam_out_nosave
@@ -138,4 +137,4 @@ def run_demo():
     block.launch(share=True)
 
 if __name__ == '__main__':
-    fire.Fire(run_demo)
+    run_demo()
