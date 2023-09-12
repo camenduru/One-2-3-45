@@ -132,7 +132,7 @@ with block:
             run_button = gr.Button(label="Run")
         with gr.Column():
             mesh_path = gr.Textbox(label="Mesh Path")
-            # mesh_output = gr.Model3D(clear_color=[0.0, 0.0, 0.0, 0.0], label="One-2-3-45's Textured Mesh", elem_id="model-3d-out")
-    run_button.click(fn=partial(generate, models, predictor), inputs=[img_path], outputs=[mesh_path])
+            mesh_output = gr.Model3D(clear_color=[0.0, 0.0, 0.0, 0.0], label="One-2-3-45's Textured Mesh", elem_id="model-3d-out")
+    run_button.click(fn=partial(generate, models, predictor), inputs=[img_path], outputs=[mesh_output])
 
 block.launch(share=True)
