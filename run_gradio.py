@@ -1,7 +1,7 @@
 import os
 import gradio as gr
 import torch
-import argparse
+import fire
 from PIL import Image
 from utils.zero123_utils import init_model, predict_stage1_gradio, zero123_infer
 from utils.sam_utils import sam_init, sam_out_nosave
@@ -98,25 +98,13 @@ def predict_multiview(shape_dir, args):
     # second stage: 4 local views for each of the first-stage view, resulting in N*4=32 source view images.
     stage2_run(model_zero123, device, shape_dir, elev, scale=3, stage2_steps=50)
 
-def generate(img_path):
+def generate(img_path, device, models, predictor):
     shape_id = img_path.split('/')[-1].split('.')[0]
     shape_dir = f"./exp/{shape_id}"
     os.makedirs(shape_dir, exist_ok=True)
     
-    device = f"cuda:0"
-    global models
-    if models is not None:
-        return models
-    else:
-        models = init_model(device, 'zero123-xl.ckpt', half_precision=True)
+    model_zero123 = models["turncam"]
     
-    global model_zero123
-    if model_zero123 is not None:
-        return model_zero123
-    else:
-        model_zero123 = models["turncam"]
-
-    predictor = sam_init(0)
     input_raw = Image.open(img_path)
     input_256 = preprocess(predictor, input_raw)
     elev, stage1_imgs = stage1_run(model_zero123, device, shape_dir, input_256, scale=3, ddim_steps=75)
@@ -133,15 +121,24 @@ def generate(img_path):
     # print("Mesh saved to:", mesh_path)
     return mesh_path
 
-block = gr.Blocks().queue()
-with block:
-    with gr.Row():
-        with gr.Column():
-            input_image = gr.Image(source='upload', type="filepath")
-            run_button = gr.Button(label="Run")
-        with gr.Column():
-            mesh_path = gr.Textbox(label="Mesh Path")
-            # mesh_output = gr.Model3D(clear_color=[0.0, 0.0, 0.0, 0.0], label="One-2-3-45's Textured Mesh", elem_id="model-3d-out")
-    run_button.click(fn=generate, inputs=[input_image], outputs=[mesh_path])
 
-block.launch(share=True)
+def run_demo():
+    device = f"cuda:0"
+    models = init_model(device, 'zero123-xl.ckpt', half_precision=True)
+    predictor = sam_init(0)
+
+    block = gr.Blocks().queue()
+    with block:
+        with gr.Row():
+            with gr.Column():
+                input_image = gr.Image(source='upload', type="filepath")
+                run_button = gr.Button(label="Run")
+            with gr.Column():
+                mesh_path = gr.Textbox(label="Mesh Path")
+                # mesh_output = gr.Model3D(clear_color=[0.0, 0.0, 0.0, 0.0], label="One-2-3-45's Textured Mesh", elem_id="model-3d-out")
+        run_button.click(fn=generate, inputs=[input_image, device, models, predictor], outputs=[mesh_path])
+
+    block.launch(share=True)
+
+if __name__ == '__main__':
+    fire.Fire(run_demo)
