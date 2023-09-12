@@ -2,6 +2,7 @@ import os
 import gradio as gr
 import torch
 from PIL import Image
+from functools import partial
 from utils.zero123_utils import init_model, predict_stage1_gradio, zero123_infer
 from utils.sam_utils import sam_init, sam_out_nosave
 from utils.utils import pred_bbox, image_preprocess_nosave, gen_poses, convert_mesh_format
@@ -94,7 +95,7 @@ def reconstruct(exp_dir, output_format=".ply", device_idx=0, resolution=256):
 #     # second stage: 4 local views for each of the first-stage view, resulting in N*4=32 source view images.
 #     stage2_run(model_zero123, device, shape_dir, elev, scale=3, stage2_steps=50)
 
-def generate(img_path, device, models, predictor):
+def generate(models, predictor, img_path, device):
     shape_id = img_path.split('/')[-1].split('.')[0]
     shape_dir = f"./exp/{shape_id}"
     os.makedirs(shape_dir, exist_ok=True)
@@ -131,6 +132,6 @@ with block:
         with gr.Column():
             mesh_path = gr.Textbox(label="Mesh Path")
             # mesh_output = gr.Model3D(clear_color=[0.0, 0.0, 0.0, 0.0], label="One-2-3-45's Textured Mesh", elem_id="model-3d-out")
-    run_button.click(fn=generate, inputs=[input_image, device, models, predictor], outputs=[mesh_path])
+    run_button.click(fn=partial(generate, models, predictor), inputs=[input_image, device], outputs=[mesh_path])
 
 block.launch(share=True)
