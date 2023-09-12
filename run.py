@@ -86,7 +86,7 @@ def predict_multiview(shape_dir, args):
         models = init_model(device, 'zero123-xl.ckpt', half_precision=args.half_precision)
 
     # initialize the zero123 model
-    models = init_model(device, 'zero123-xl.ckpt', half_precision=args.half_precision)
+    # models = init_model(device, 'zero123-xl.ckpt', half_precision=args.half_precision)
     model_zero123 = models["turncam"]
 
     # initialize the Segment Anything model
